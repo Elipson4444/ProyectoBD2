@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 80%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        tr:hover {
+            background: #e6f0ff;
+        }
+
+        .btn-volver {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            text-align: center;
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn-volver:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Productos</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID Producto</th>
+                <th>ID Categoría</th>
+                <th>Nombre</th>
+                <th>Talla</th>
+                <th>Color</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.0 }}</td>
+                <td>{{ producto.1 }}</td>
+                <td>{{ producto.2 }}</td>
+                <td>{{ producto.3 }}</td>
+                <td>{{ producto.4 }}</td>
+                <td>${{ producto.5 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">No hay productos registrados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/" class="btn-volver">Volver al inicio</a>
+</body>
+</html>
