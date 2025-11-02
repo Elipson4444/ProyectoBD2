@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,6 +26,13 @@ SECRET_KEY = 'django-insecure-5aybp3$(s43ofx#n+%0how!#x7hk0cpb(qtzm3+ysl-qb3uo8@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+SESSION_COOKIE_NAME = "sesion"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 3600  
+
+
 ALLOWED_HOSTS = []
 
 
@@ -38,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'login',
+    'inicio'
 ]
 
 MIDDLEWARE = [
@@ -55,7 +64,7 @@ ROOT_URLCONF = 'bd2.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,6 +129,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
