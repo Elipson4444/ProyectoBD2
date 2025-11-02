@@ -1,3 +1,36 @@
 {% extends 'base.html' %}
 
 {% block titlulo %}Panel Inventario {% endblock %}
+
+{% block contenido %}
+<table>
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Valor unitario</th>
+            <th>Valor stock</th>
+            <th>Stock</th>
+            <th>Stock mínimo</th>
+            <th>Stock máximo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.0 }}</td>
+            <td>{{ producto.1 }}</td>
+            <td>{{ producto.2 }}</td>
+            <td>{{ producto.3 }}</td>
+            <td>{{ producto.4 }}</td>
+            <td>{{ producto.5 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+
+<div>
+
+{% endblock %}
