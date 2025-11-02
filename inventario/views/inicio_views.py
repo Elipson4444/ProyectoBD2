@@ -1,8 +1,5 @@
 from django.shortcuts import redirect, render
 
-from login.views import nombre
-
-
 def inicio(request):
     id_usuario = request.session.get('id_usuario') 
     if not id_usuario:

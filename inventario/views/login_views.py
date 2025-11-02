@@ -1,32 +1,8 @@
 from django.contrib import messages
 from django.db import connection
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+import hashlib
 
-
-
-
-def hello(request):
-    return HttpResponse ("<h1>Hola mundo<h1>")
-
-def about(request):
-    return HttpResponse("About") 
-
-def nombre (request, nombre):
-    return HttpResponse(nombre)
-
-def animal (request, animal):
-    return HttpResponse("<h1>Animal %s<h1>" % animal)
-
-
-def base (request):
-    return render(request,'login/base.html')
-
-def lista_productos(request):
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM producto;")
-        productos = cursor.fetchall() 
-    return render(request, 'login/lista_inventario.html', {'productos': productos})
 
 
 def login (request):
@@ -34,8 +10,13 @@ def login (request):
         num_documento = request.POST.get('num_documento')
         clave = request.POST.get('clave')
 
+        hash_clave = hashlib.blake2b(clave.encode(), digest_size=20).hexdigest()
+        
+        
+        print(hash_clave)
+
         with connection.cursor() as cursor:
-            cursor.callproc("sp_login",[num_documento,clave])
+            cursor.callproc("sp_login",[num_documento,hash_clave])
             credencial = cursor.fetchall()
             
             if credencial[0][0]  is not None:
@@ -47,7 +28,7 @@ def login (request):
             else:
                 messages.error(request,'Credencial no valida.')
 
-    return render(request,'login/login.html')
+    return render(request,'login.html')
 
 
 def logout (request):
