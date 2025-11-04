@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Panel Ingreso Inventario{% endblock %}
+
+{% block contenido %}
+
+<div class="table-responsive bg-white rounded shadow-sm p-3">
+  <h3 class="mb-3 text-center">Ingresos de Inventario</h3>
+  <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+          <tr>
+              <th>ID Ingreso</th>
+              <th>Tienda</th>
+              <th>Registro</th>
+              <th>Fecha</th>
+              <th>Tipo productos</th>
+              <th>Motivo</th>
+              <th>Valor ingreso</th>
+              <th>Acciones</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for ingreso in detalles_ingresos %}
+          <tr>
+              <td>{{ ingreso.0 }}</td>
+              <td>{{ ingreso.1 }}</td>
+              <td>{{ ingreso.2 }}</td>
+              <td>{{ ingreso.3 }}</td>
+              <td>{{ ingreso.4 }}</td>
+              <td>{{ ingreso.5 }}</td>
+              <td>${{ ingreso.6 }}</td>
+              <td>
+                <a href="{% url 'detalle_ingreso' ingreso.0 %}" class="btn btn-sm btn-primary">
+                Ver Detalles
+                </a>
+
+              </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+
+  <div class="mb-3 text-center">
+    <!-- Botón para abrir modal de selección de motivo -->
+    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#modalMotivo">
+      Nuevo Ingreso
+    </button>
+    <a href="#" class="btn btn-info text-white">Traslado Inventario</a>
+  </div>
+</div>
+
+<!-- Modal para seleccionar motivo de ingreso -->
+<div class="modal fade" id="modalMotivo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'agregar_inventario' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Seleccionar motivo de ingreso</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="motivo" class="form-label">Motivo:</label>
+            <select class="form-select" id="motivo" name="motivo" required>
+              <option value="" disabled selected>Selecciona un motivo</option>
+              <option value="recepción">Recepción</option>
+              <option value="devolución">Devolución</option>
+              <option value="ajuste">Ajuste</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Ingresar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Aquí puedes agregar scripts si necesitas manejar modales o botones dinámicos -->
+{% endblock %}
