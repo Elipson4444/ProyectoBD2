@@ -2,6 +2,7 @@ from django.db import connection
 from django.shortcuts import redirect, render
 
 
+# PARTE INVENTARIO
 
 def panel_inventario(request):
     if 'id_usuario' not in request.session:
@@ -18,51 +19,7 @@ def panel_inventario(request):
 
     return render(request,'panel_inventario.html',{'productos':productos,'inventario_info':inventario_info,'rol':request.session.get('rol')})
 
-
-def panel_ingreso_inventario(request):
-    if 'id_usuario' not in request.session:
-        return redirect('login')
     
-    id_tienda = request.session.get('id_tienda')
-
-    with connection.cursor() as cursor :
-        cursor.callproc('sp_mostrarIngresosInventario',[id_tienda])
-        detalles_ingresos = cursor.fetchall()
-
-    return render(request,'panel_ingreso_inventario.html',{'detalles_ingresos':detalles_ingresos})
-
-
-def ingreso_inventario(request):
-    if 'id_usuario' not in request.session:
-        return redirect('login')
-    
-    if request.method =='POST':
-
-        motivo = request.POST.get('motivo')
-        id_tienda = request.session.get('id_tienda')
-        id_usuario = request.session.get('id_usuario')
-
-        with connection.cursor() as cursor:
-
-            cursor.callproc('sp_ingresoInventario',[id_tienda,id_usuario,motivo])
-            connection.commit()
-
-    return redirect('ingreso_inventario')
-    
-
-def panel_detalle_ingreso(request,id_ingreso_inventario):
-    if 'id_usuario' not in request.session:
-        return redirect('login')
-    
-    with connection.cursor() as cursor:
-        cursor.callproc('sp_mostrarDetallesIngreso',[id_ingreso_inventario])
-        detalles = cursor.fetchall()
-    
-
-    return render(request,'panel_detalle_inventario.html',{'detalles':detalles})
-
-
-
 
 def actualizar_producto_inventario(request,id_detalle_inventario):
     if 'id_usuario' not in request.session:
@@ -90,3 +47,184 @@ def eliminar_producto_inventario(request,id_detalle_inventario):
 
 
 
+
+# PARTE INGRESO INVENTARIO
+
+
+def panel_ingreso_inventario(request):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+    
+    id_tienda = request.session.get('id_tienda')
+    rol = request.session.get('rol')
+
+    with connection.cursor() as cursor :
+        cursor.callproc('sp_mostrarIngresosInventario',[id_tienda])
+        detalles_ingresos = cursor.fetchall()
+
+    return render(request,'panel_ingreso_inventario.html',{'detalles_ingresos':detalles_ingresos , 'rol':rol})
+
+
+
+def ingreso_inventario(request):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+    
+    if request.method =='POST':
+
+        motivo = request.POST.get('motivo')
+        id_tienda = request.session.get('id_tienda')
+        id_usuario = request.session.get('id_usuario')
+
+        with connection.cursor() as cursor:
+
+            cursor.callproc('sp_ingresoInventario',[id_tienda,id_usuario,motivo])
+            connection.commit()
+
+    return redirect('ingreso_inventario')
+
+def actualizar_ingreso_inventario(request, id_ingreso_inventario):
+     if 'id_usuario' not in request.session:
+        return redirect('login')
+     
+     if request.method == 'POST':
+         motivo = request.POST.get('motivo')
+        
+         with connection.cursor() as cursor:
+            cursor.callproc('sp_actualizarIngresoInventario',[id_ingreso_inventario,motivo])
+        
+            return redirect('ingreso_inventario')
+
+
+def eliminar_ingreso_inventario(request,id_ingreso_inventario):
+     if 'id_usuario' not in request.session:
+        return redirect('login')
+     
+     with connection.cursor() as cursor :
+         cursor.callproc('sp_eliminarIngresoInventario',[id_ingreso_inventario])
+         return redirect('ingreso_inventario')
+
+
+
+
+# PARTE DETALLE INGRESO
+
+
+def panel_detalle_ingreso(request,id_ingreso_inventario):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+    rol = request.session.get('rol')
+    with connection.cursor() as cursor1:
+        cursor1.callproc('sp_mostrarDetallesIngreso',[id_ingreso_inventario])
+        detalles = cursor1.fetchall()
+
+    with connection.cursor() as cursos2:
+        cursos2.callproc('sp_ConsultarTodoProducto')  
+        productos = cursos2.fetchall()  
+
+    return render(request,'panel_detalle_inventario.html',{'detalles':detalles,'rol':rol,'productos':productos,'id_ingreso_inventario':id_ingreso_inventario})
+
+
+
+
+def agregar_detalle_ingreso(request, id_ingreso_inventario):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+
+    if request.method == 'POST':
+        id_producto = request.POST.get('id_producto')
+        cantidad = request.POST.get('cantidad')
+
+        with connection.cursor() as cursor:
+            cursor.callproc('sp_registrarDetalleIngreso', [id_ingreso_inventario, id_producto, cantidad])
+            
+
+        return redirect('detalle_ingreso', id_ingreso_inventario=id_ingreso_inventario)
+    
+def actualizar_detalle_ingreso(request, id_detalle_ingreso):
+     if 'id_usuario' not in request.session:
+        return redirect('login')
+     
+     if request.method == 'POST':
+         cantidad = request.POST.get('cantidad')
+         id_ingreso = request.POST.get('id_ingreso')
+
+         with connection.cursor() as cursor:
+            cursor.callproc('sp_actualizarDetalleIngreso',[id_detalle_ingreso,cantidad])
+        
+            return redirect('detalle_ingreso', id_ingreso_inventario=id_ingreso)
+                            
+
+
+
+def eliminar_detalle_ingreso(request, id_detalle_ingreso,id_ingreso_inventario):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.callproc('sp_eliminarDetalleIngreso',[id_detalle_ingreso])
+
+        return redirect('detalle_ingreso', id_ingreso_inventario=id_ingreso_inventario)
+
+
+
+# TRASLADO INVENTARIO
+
+def panel_traslado_inventario(request):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+    
+    rol = request.session.get('rol')
+    id_tienda = request.session.get('id_tienda')
+    tienda_emplado = None
+
+    with connection.cursor() as cursor1:
+        cursor1.callproc('sp_mostrarTrasladoInventario',[id_tienda])
+        traslados = cursor1.fetchall()
+
+    with connection.cursor() as cursor2:
+
+        cursor2.callproc('sp_seleccionarTienda')
+        tiendas = cursor2.fetchall()
+
+        for i in tiendas:
+            if i[0] == id_tienda:
+                tienda_emplado = i
+                break
+
+
+        return render(request,'panel_traslado_inventario.html',{'traslados':traslados ,'tiendas':tiendas, 'rol':rol,'tienda':tienda_emplado})
+    
+
+
+
+def agregar_traslado_inventario(request):
+
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+    
+    if request.method =='POST':
+
+        origen = request.POST.get('origen')
+        destino = request.POST.get('destino')
+        id_usuario = request.session.get('id_usuario')
+
+        with connection.cursor() as cursor:
+
+            cursor.callproc('sp_registrarTrasladoInventario',[origen,destino,id_usuario])
+            connection.commit()
+
+
+    return redirect('traslado_inventario')
+
+
+
+
+
+def eliminar_traslado_inventario(request,id_traslado_inventario):
+     if 'id_usuario' not in request.session:
+        return redirect('login')
+     
+     with connection.cursor() as cursor :
+         cursor.callproc('sp_eliminarTraslado',[id_traslado_inventario])
+         return redirect('traslado_inventario')
