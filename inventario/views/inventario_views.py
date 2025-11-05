@@ -228,3 +228,68 @@ def eliminar_traslado_inventario(request,id_traslado_inventario):
      with connection.cursor() as cursor :
          cursor.callproc('sp_eliminarTraslado',[id_traslado_inventario])
          return redirect('traslado_inventario')
+     
+
+# Detalles traslado
+
+def panel_detalle_traslado (request,id_traslado_inventario):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+    rol = request.session.get('rol')
+
+    with connection.cursor() as cursor1:
+        cursor1.callproc('sp_mostrarDetalleTraslado',[id_traslado_inventario])
+        detalles = cursor1.fetchall()
+
+    with connection.cursor() as cursos2:
+        cursos2.callproc('sp_ConsultarTodoProducto')  
+        productos = cursos2.fetchall()  
+
+    return render(request,'panel_detalle_traslado.html',{'detalles':detalles,'rol':rol,'productos':productos,'id_traslado_inventario':id_traslado_inventario})
+
+
+
+
+
+def agregar_detalle_traslado (request, id_traslado_inventario):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+
+    if request.method == 'POST':
+        id_producto = request.POST.get('id_producto')
+        cantidad = request.POST.get('cantidad')
+
+        with connection.cursor() as cursor:
+            cursor.callproc('sp_registrarDetalleTraslado', [id_traslado_inventario, id_producto, cantidad])
+            
+
+        return redirect('detalle_traslado', id_traslado_inventario=id_traslado_inventario)
+    
+
+
+
+    
+def actualizar_detalle_traslado (request, id_detalle_traslado):
+     if 'id_usuario' not in request.session:
+        return redirect('login')
+     
+     if request.method == 'POST':
+         cantidad = request.POST.get('cantidad')
+         id_traslado = request.POST.get('id_traslado')
+
+         with connection.cursor() as cursor:
+            cursor.callproc('sp_actualizarDetalleTraslado',[id_detalle_traslado,cantidad])
+        
+            return redirect('detalle_traslado', id_traslado_inventario=id_traslado)
+                            
+
+
+
+def eliminar_detalle_traslado (request, id_detalle_traslado,id_traslado_inventario):
+    if 'id_usuario' not in request.session:
+        return redirect('login')
+
+    with connection.cursor() as cursor:
+        cursor.callproc('sp_eliminarDetalleTraslado',[id_detalle_traslado])
+
+        return redirect('detalle_traslado', id_traslado_inventario=id_traslado_inventario)
