@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Panel Traslados Inventario{% endblock %}
+
+{% block contenido %}
+
+<div class="table-responsive bg-white rounded shadow-sm p-3">
+  <h3 class="mb-3 text-center">Traslados de Inventario</h3>
+  <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+          <tr>
+              <th>ID Traslado</th>
+              <th>Usuario</th>
+              <th>Origen</th>
+              <th>Destino</th>
+              <th>Fecha</th>
+              <th colspan="3">Acciones</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for traslado in traslados %}
+          <tr>
+              <td>{{ traslado.0 }}</td>
+              <td>{{ traslado.1 }}</td>
+              <td>{{ traslado.2 }}</td>
+              <td>{{ traslado.3 }}</td>
+              <td>{{ traslado.4 }}</td>
+              <td>
+                <a href="#" class="btn btn-sm btn-primary">
+                  Ver Detalles
+                </a>
+              </td>
+              {% if rol == 'administrador' %}
+              <td>
+           
+                <button class="btn btn-sm btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalActualizar{{ traslado.0 }}">
+                  <i class="bi bi-pencil"></i> Actualizar
+                </button>
+              </td>
+              <td>
+                <a href="{% url 'eliminar_traslado_inventario' traslado.0 %}" class="btn btn-sm btn-danger">
+                  <i class="bi bi-trash"></i> Eliminar
+                </a>
+              </td>
+              {% endif %}
+          </tr>
+
+          
+          <div class="modal fade" id="modalActualizar{{ traslado.0 }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="POST" action="#">
+                  {% csrf_token %}
+                 <div class="modal-header">
+                    <h5 class="modal-title text-primary d-flex align-items-center">
+                    <i class="bi bi-pencil-square me-2"></i>
+                     Actualizar Traslado
+                    </h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                 </div>
+
+
+
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label for="origen{{ traslado.0 }}" class="form-label">Tienda Origen:</label>
+                      <select class="form-select origen" id="origen{{ traslado.0 }}" name="origen" required>
+                        <option value="" disabled selected>Selecciona la tienda origen</option>
+                        {% for t in tiendas %}
+                        <option value="{{ t.0 }}" {% if t.1 == traslado.2 %}selected{% endif %}>
+                          {{ t.1 }}{% if t.0 == tienda.0 %} (Mi tienda){% endif %}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="destino{{ traslado.0 }}" class="form-label">Tienda Destino:</label>
+                      <select class="form-select destino" id="destino{{ traslado.0 }}" name="destino" required>
+                        <option value="" disabled selected>Selecciona la tienda destino</option>
+                        {% for t in tiendas %}
+                        <option value="{{ t.0 }}" {% if t.1 == traslado.3 %}selected{% endif %}>
+                          {{ t.1 }}{% if t.0 == tienda.0 %} (Mi tienda){% endif %}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+
+                    <div id="alerta{{ traslado.0 }}" class="text-danger fw-semibold text-center d-none"></div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning" id="btnActualizar{{ traslado.0 }}">Guardar cambios</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {% endfor %}
+      </tbody>
+  </table>
+</div>
+
+<div class="mb-3 text-center">
+  <a href="{% url 'inicio' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Volver
+  </a>
+  {% if rol == 'administrador' %}
+  <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#modalNuevoTraslado">
+    Nuevo Traslado
+  </button>
+  {% endif %}
+</div>
+
+
+<div class="modal fade" id="modalNuevoTraslado" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'agregar_traslado_inventario' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Registrar Nuevo Traslado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="origenNuevo" class="form-label">Tienda Origen:</label>
+            <select class="form-select origen" id="origenNuevo" name="origen" required>
+              <option value="" disabled selected>Selecciona la tienda origen</option>
+              {% for t in tiendas %}
+              <option value="{{ t.0 }}" {% if t.0 == tienda.0 %}selected{% endif %}>
+                {{ t.1 }}{% if t.0 == tienda.0 %} (Mi tienda){% endif %}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="destinoNuevo" class="form-label">Tienda Destino:</label>
+            <select class="form-select destino" id="destinoNuevo" name="destino" required>
+              <option value="" disabled selected>Selecciona la tienda destino</option>
+              {% for t in tiendas %}
+              <option value="{{ t.0 }}">{{ t.1 }}{% if t.0 == tienda.0 %} (Mi tienda){% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="alertaNuevo" class="text-danger fw-semibold text-center d-none"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success" id="btnRegistrar">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const idTiendaEmpleado = "{{ tienda.0 }}";
+
+  function validarTiendas(origenId, destinoId, alertaId, botonId) {
+    const origen = document.getElementById(origenId);
+    const destino = document.getElementById(destinoId);
+    const alerta = document.getElementById(alertaId);
+    const boton = document.getElementById(botonId);
+
+    function validar() {
+      alerta.classList.add('d-none');
+      boton.disabled = false;
+
+      if (!origen.value || !destino.value) return;
+
+      if (origen.value === destino.value) {
+        alerta.textContent = "⚠️ La tienda origen y destino no pueden ser la misma.";
+        alerta.classList.remove('d-none');
+        boton.disabled = true;
+        return;
+      }
+
+      const origenEsMiTienda = origen.value === idTiendaEmpleado;
+      const destinoEsMiTienda = destino.value === idTiendaEmpleado;
+
+      if ((origenEsMiTienda && destinoEsMiTienda) || (!origenEsMiTienda && !destinoEsMiTienda)) {
+        alerta.textContent = "⚠️ Tu tienda debe estar en el traslado como origen o destino, pero no en ambas.";
+        alerta.classList.remove('d-none');
+        boton.disabled = true;
+      }
+    }
+
+    origen.addEventListener('change', validar);
+    destino.addEventListener('change', validar);
+  }
+
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    validarTiendas('origenNuevo', 'destinoNuevo', 'alertaNuevo', 'btnRegistrar');
+
+    {% for traslado in traslados %}
+      validarTiendas('origen{{ traslado.0 }}', 'destino{{ traslado.0 }}', 'alerta{{ traslado.0 }}', 'btnActualizar{{ traslado.0 }}');
+    {% endfor %}
+  });
+</script>
+
+{% endblock %}

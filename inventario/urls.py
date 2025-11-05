@@ -19,6 +19,28 @@ urlpatterns = [
 
     path('inicio/inventario/ingreso/nuevoIngreso', inventario_views.ingreso_inventario, name='agregar_inventario'),
 
-    path('inicio/inventario/ingreso/detalle/<int:id_ingreso_inventario>', inventario_views.panel_detalle_ingreso, name='detalle_ingreso')
+    path('inicio/inventario/ingreso/actualizar/<int:id_ingreso_inventario>', inventario_views.actualizar_ingreso_inventario , name='actualizar_ingreso_inventario'),
+
+    path('inicio/inventario/ingreso/eliminar/<int:id_ingreso_inventario>', inventario_views.eliminar_ingreso_inventario, name='eliminar_ingreso_inventario'),
+
+    path('inicio/inventario/ingreso/detalle/<int:id_ingreso_inventario>', inventario_views.panel_detalle_ingreso, name='detalle_ingreso'),
+
+    path('inicio/inventario/ingreso/detalle/<int:id_ingreso_inventario>/agregar',
+    inventario_views.agregar_detalle_ingreso,
+    name='agregar_detalle_ingreso'),
+
+    path('inicio/inventario/ingreso/detalle/actualizar/<int:id_detalle_ingreso>', inventario_views.actualizar_detalle_ingreso, name='actualizar_detalle_ingreso'),
+
+    path('inicio/inventario/ingreso/detalle/eliminar/<int:id_detalle_ingreso>/<int:id_ingreso_inventario>', inventario_views.eliminar_detalle_ingreso, name='eliminar_detalle_ingreso'),
+
+    
+
+    # rutas traslado
+
+    path('inicio/inventario/traslado', inventario_views.panel_traslado_inventario, name='traslado_inventario'),
+
+    path('inicio/inventario/traslado/agregar', inventario_views.agregar_traslado_inventario, name='agregar_traslado_inventario'),
+
+    path('inicio/inventario/traslado/eliminar/<int:id_traslado_inventario>', inventario_views.eliminar_traslado_inventario, name='eliminar_traslado_inventario')
     
 ] 

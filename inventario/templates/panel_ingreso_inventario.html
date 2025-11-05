@@ -16,7 +16,7 @@
               <th>Tipo productos</th>
               <th>Motivo</th>
               <th>Valor ingreso</th>
-              <th>Acciones</th>
+              <th colspan="3">Acciones</th>
           </tr>
       </thead>
       <tbody>
@@ -31,25 +31,40 @@
               <td>${{ ingreso.6 }}</td>
               <td>
                 <a href="{% url 'detalle_ingreso' ingreso.0 %}" class="btn btn-sm btn-primary">
-                Ver Detalles
+                  Ver Detalles
                 </a>
-
               </td>
+              {% if rol == 'administrador'%}
+              
+              <td>
+                <button type="button" class="btn btn-sm btn-primary btn-actualizar-ingreso"
+                        data-id="{{ ingreso.0 }}"
+                        data-motivo="{{ ingreso.5 }}">
+                  Actualizar
+                </button>
+              </td>
+              <td>
+                <a href="{% url 'eliminar_ingreso_inventario' ingreso.0 %}" class="btn btn-sm btn-danger">
+                  <i class="bi bi-trash"></i> Eliminar
+                </a>
+              </td>
+              {% endif %}
           </tr>
           {% endfor %}
       </tbody>
   </table>
-
-  <div class="mb-3 text-center">
-    <!-- Botón para abrir modal de selección de motivo -->
-    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#modalMotivo">
-      Nuevo Ingreso
-    </button>
-    <a href="#" class="btn btn-info text-white">Traslado Inventario</a>
-  </div>
 </div>
 
-<!-- Modal para seleccionar motivo de ingreso -->
+
+<div class="mb-3 text-center">
+  <a href="{% url 'inventario' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Volver
+  </a>
+  <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#modalMotivo">
+    Nuevo Ingreso
+  </button>
+</div>
+
 <div class="modal fade" id="modalMotivo" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -79,8 +94,61 @@
   </div>
 </div>
 
+
+<div class="modal fade" id="modalActualizarIngreso" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="formActualizarIngreso" method="POST" action="">
+        {% csrf_token %}
+        <input type="hidden" name="id_ingreso_inventario" id="modal-ingreso-id">
+        <div class="modal-header">
+          <h5 class="modal-title">Actualizar Motivo de Ingreso</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modal-motivo" class="form-label">Motivo</label>
+            <select class="form-select" id="modal-motivo" name="motivo" required>
+              <option value="recepción">Recepción</option>
+              <option value="devolución">Devolución</option>
+              <option value="ajuste">Ajuste</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
-<!-- Aquí puedes agregar scripts si necesitas manejar modales o botones dinámicos -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modalActualizarIngreso = document.getElementById('modalActualizarIngreso');
+  if (modalActualizarIngreso) {
+    const modal = new bootstrap.Modal(modalActualizarIngreso);
+
+    document.querySelectorAll('.btn-actualizar-ingreso').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const motivo = btn.dataset.motivo;
+
+        document.getElementById('modal-ingreso-id').value = id;
+        document.getElementById('modal-motivo').value = motivo;
+
+        
+        document.getElementById('formActualizarIngreso').action =
+          `/inicio/inventario/ingreso/actualizar/${id}`;
+
+        modal.show();
+      });
+    });
+  }
+});
+</script>
 {% endblock %}

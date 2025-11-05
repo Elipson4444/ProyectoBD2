@@ -12,6 +12,7 @@ def login (request):
 
         hash_clave = hashlib.blake2b(clave.encode(), digest_size=20).hexdigest()
         
+        
 
         with connection.cursor() as cursor:
             cursor.callproc("sp_login",[num_documento,hash_clave])
