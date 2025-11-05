@@ -26,7 +26,7 @@
               <td>{{ traslado.3 }}</td>
               <td>{{ traslado.4 }}</td>
               <td>
-                <a href="#" class="btn btn-sm btn-primary">
+                <a href="{% url 'detalle_traslado' traslado.0 %}" class="btn btn-sm btn-primary">
                   Ver Detalles
                 </a>
               </td>
@@ -106,14 +106,14 @@
 </div>
 
 <div class="mb-3 text-center">
-  <a href="{% url 'inicio' %}" class="btn btn-secondary">
+  <a href="{% url 'inventario' %}" class="btn btn-secondary">
     <i class="bi bi-arrow-left"></i> Volver
   </a>
-  {% if rol == 'administrador' %}
+ 
   <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#modalNuevoTraslado">
     Nuevo Traslado
   </button>
-  {% endif %}
+ 
 </div>
 
 
