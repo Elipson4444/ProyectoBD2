@@ -1,5 +1,7 @@
 from django.db import connection
 from django.shortcuts import redirect, render
+from inventario.models_mongo import EventoSistema
+
 
 
 # PARTE INVENTARIO
@@ -27,14 +29,22 @@ def actualizar_producto_inventario(request,id_detalle_inventario):
     
     if request.method == 'POST':
         cantidad = request.POST.get('cantidad')
-        stock_minimo =request.POST.get('stock_minimo')
+        stock_minimo = request.POST.get('stock_minimo')
         stock_maximo = request.POST.get('stock_maximo')
 
         with connection.cursor() as cursor:
             cursor.callproc('sp_actualizarDetallesInventario',[id_detalle_inventario,cantidad,stock_minimo,stock_maximo])
             connection.commit()
 
-            return redirect('inventario')
+        #  AUDITORÍA
+        EventoSistema(
+            usuario=request.session.get('nombre'),
+            accion="ACTUALIZAR_PRODUCTO_INVENTARIO",
+            descripcion=f"Detalle #{id_detalle_inventario} → Cantidad: {cantidad}, Min: {stock_minimo}, Max: {stock_maximo}",
+            ip=request.META.get('REMOTE_ADDR')
+        ).save()
+
+        return redirect('inventario')
 
 def eliminar_producto_inventario(request,id_detalle_inventario):
     if 'id_usuario' not in request.session:
@@ -43,7 +53,17 @@ def eliminar_producto_inventario(request,id_detalle_inventario):
     with connection.cursor() as cursor:
         cursor.callproc('sp_eliminarDetalleInventario',[id_detalle_inventario])
         connection.commit()
+
+    # AUDITORÍA
+    EventoSistema(
+        usuario=request.session.get('nombre'),
+        accion="ELIMINAR_PRODUCTO_INVENTARIO",
+        descripcion=f"Se eliminó el detalle de inventario #{id_detalle_inventario}",
+        ip=request.META.get('REMOTE_ADDR')
+    ).save()
+
     return redirect('inventario')
+
 
 
 
@@ -70,18 +90,26 @@ def ingreso_inventario(request):
     if 'id_usuario' not in request.session:
         return redirect('login')
     
-    if request.method =='POST':
+    if request.method == 'POST':
 
         motivo = request.POST.get('motivo')
         id_tienda = request.session.get('id_tienda')
         id_usuario = request.session.get('id_usuario')
 
         with connection.cursor() as cursor:
-
             cursor.callproc('sp_ingresoInventario',[id_tienda,id_usuario,motivo])
             connection.commit()
 
+        #  AUDITORÍA
+        EventoSistema(
+            usuario=request.session.get('nombre'),
+            accion="NUEVO_INGRESO_INVENTARIO",
+            descripcion=f"Motivo: {motivo}",
+            ip=request.META.get('REMOTE_ADDR')
+        ).save()
+
     return redirect('ingreso_inventario')
+
 
 def actualizar_ingreso_inventario(request, id_ingreso_inventario):
      if 'id_usuario' not in request.session:
@@ -137,9 +165,18 @@ def agregar_detalle_ingreso(request, id_ingreso_inventario):
 
         with connection.cursor() as cursor:
             cursor.callproc('sp_registrarDetalleIngreso', [id_ingreso_inventario, id_producto, cantidad])
-            
+            connection.commit()
+
+        # AUDITORÍA
+        EventoSistema(
+            usuario=request.session.get('nombre'),
+            accion="AGREGAR_PRODUCTO_INGRESO",
+            descripcion=f"Ingreso #{id_ingreso_inventario} → Producto {id_producto} x{cantidad}",
+            ip=request.META.get('REMOTE_ADDR')
+        ).save()
 
         return redirect('detalle_ingreso', id_ingreso_inventario=id_ingreso_inventario)
+
     
 def actualizar_detalle_ingreso(request, id_detalle_ingreso):
      if 'id_usuario' not in request.session:
@@ -199,7 +236,6 @@ def panel_traslado_inventario(request):
 
 
 def agregar_traslado_inventario(request):
-
     if 'id_usuario' not in request.session:
         return redirect('login')
     
@@ -210,12 +246,19 @@ def agregar_traslado_inventario(request):
         id_usuario = request.session.get('id_usuario')
 
         with connection.cursor() as cursor:
-
             cursor.callproc('sp_registrarTrasladoInventario',[origen,destino,id_usuario])
             connection.commit()
 
+        #  AUDITORÍA
+        EventoSistema(
+            usuario=request.session.get('nombre'),
+            accion="TRASLADO_INVENTARIO",
+            descripcion=f"Traslado de tienda {origen} → {destino}",
+            ip=request.META.get('REMOTE_ADDR')
+        ).save()
 
     return redirect('traslado_inventario')
+
 
 
 

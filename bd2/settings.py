@@ -11,8 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, pymysql
+from mongoengine import connect
 
+connect(
+    host="mongodb+srv://jdpovedac_db_user:bases2@cluster0.dsmklq5.mongodb.net/?appName=Cluster0y"
+)
+
+pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -56,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'inventario.middleware.AuditoriaMiddleware',
 ]
 
 ROOT_URLCONF = 'bd2.urls'
@@ -85,9 +92,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'PROYECTO',
-        'USER': 'jhosman',
+        'USER': 'julian',
         'PASSWORD': '12345',
-        'HOST': '192.168.2.23',
+        'HOST': '192.168.80.24',
         'PORT': '3306',
     }
 }
@@ -136,3 +143,5 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = 'login'
+

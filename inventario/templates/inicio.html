@@ -12,6 +12,7 @@
 
   <div class="row g-4 justify-content-center">
 
+    <!-- INVENTARIO -->
     <div class="col-12 col-md-5 col-lg-3">
       <div class="card text-center shadow-sm border-0 h-100 card-hover">
         <div class="card-body">
@@ -23,6 +24,7 @@
       </div>
     </div>
 
+    <!-- VENTAS -->
     <div class="col-12 col-md-5 col-lg-3">
       <div class="card text-center shadow-sm border-0 h-100 card-hover">
         <div class="card-body">
@@ -34,18 +36,33 @@
       </div>
     </div>
 
+    <!-- HISTORIAL (Visible para todos los roles) -->
+    <div class="col-12 col-md-5 col-lg-3">
+      <div class="card text-center shadow-sm border-0 h-100 card-hover">
+        <div class="card-body">
+          <i class="bi bi-journal-text display-4 text-info"></i>
+          <h5 class="card-title mt-3">Historial del Sistema</h5>
+          <p class="text-muted small">Auditoría de actividades registradas</p>
+          <a href="{% url 'historial' %}" class="btn btn-info text-white w-100">Ver historial</a>
+        </div>
+      </div>
+    </div>
+
     {% if rol == 'administrador' %}
+
+      <!-- PERSONAL -->
       <div class="col-12 col-md-5 col-lg-3">
         <div class="card text-center shadow-sm border-0 h-100 card-hover">
           <div class="card-body">
             <i class="bi bi-people-fill display-4 text-warning"></i>
             <h5 class="card-title mt-3">Personal</h5>
             <p class="text-muted small">Gestión de empleados</p>
-            <a href="#" class="btn btn-warning text-white w-100">Entrar</a>
+            <a href="{% url 'personal' %}" class="btn btn-warning text-white w-100">Entrar</a>
           </div>
         </div>
       </div>
 
+      <!-- TIENDAS -->
       <div class="col-12 col-md-5 col-lg-3">
         <div class="card text-center shadow-sm border-0 h-100 card-hover">
           <div class="card-body">
@@ -56,6 +73,7 @@
           </div>
         </div>
       </div>
+
     {% endif %}
 
   </div>
